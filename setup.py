@@ -7,6 +7,6 @@ setup(name='pycrcgen',
     description='fork of pycrc',
     author='Joshua O\'Leary',
     author_email='josh.oleary@mobile-power.co.uk',
-    url='https://www.python.org/sigs/distutils-sig/',
+    url='https://github.com/mobile-power/pycrcgen',
     packages=['PyCRC'],
 )
