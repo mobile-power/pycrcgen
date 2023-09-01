@@ -10,7 +10,7 @@ from ctypes import c_ushort
 
 
 class CRC16(object):
-    crc16_tab = []
+    crc16_tab: list[int] = []
 
     # The CRC's are computed using polynomials. Here is the most used
     # coefficient for CRC16
@@ -22,26 +22,17 @@ class CRC16(object):
             self.init_crc16()
         self.mdflag = bool(modbus_flag)
 
-    def calculate(self, input_data=None):
-        try:
-            is_string = isinstance(input_data, str)
-            is_bytes = isinstance(input_data, bytes)
+    def calculate(self, input_data: bytes | str):
+        if isinstance(input_data, str):
+            input_data = input_data.encode('ascii')
 
-            if not is_string and not is_bytes:
-                raise Exception("Please provide a string or a byte sequence "
-                                "as argument for calculation.")
+        crcValue = 0x0000 if not self.mdflag else 0xffff
 
-            crcValue = 0x0000 if not self.mdflag else 0xffff
+        crc16_tab = self.crc16_tab
+        for d in input_data:
+            crcValue = ((crcValue >> 8) & 0xFFFF) ^ crc16_tab[(crcValue ^ d) & 0x00ff]
 
-            for c in input_data:
-                d = ord(c) if is_string else c
-                tmp = crcValue ^ d
-                rotated = c_ushort(crcValue >> 8).value
-                crcValue = rotated ^ int(self.crc16_tab[(tmp & 0x00ff)], 0)
-
-            return crcValue
-        except Exception as e:
-            print("EXCEPTION(calculate): {}".format(e))
+        return crcValue
 
     def init_crc16(self):
         '''The algorithm uses tables with precalculated values'''
@@ -52,4 +43,4 @@ class CRC16(object):
                     crc = c_ushort(crc >> 1).value ^ self.crc16_constant
                 else:
                     crc = c_ushort(crc >> 1).value
-            self.crc16_tab.append(hex(crc))
+            self.crc16_tab.append(crc)
