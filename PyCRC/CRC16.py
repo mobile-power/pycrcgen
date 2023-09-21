@@ -7,10 +7,11 @@
 #
 
 from ctypes import c_ushort
+from typing import Union, List
 
 
 class CRC16(object):
-    crc16_tab: list[int] = []
+    crc16_tab: List[int] = []
 
     # The CRC's are computed using polynomials. Here is the most used
     # coefficient for CRC16
@@ -22,7 +23,7 @@ class CRC16(object):
             self.init_crc16()
         self.mdflag = bool(modbus_flag)
 
-    def calculate(self, input_data: bytes | str):
+    def calculate(self, input_data: Union[bytes, str]):
         if isinstance(input_data, str):
             input_data = input_data.encode('ascii')
 
